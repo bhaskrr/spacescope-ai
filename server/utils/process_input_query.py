@@ -58,6 +58,6 @@ def is_appropriate_with_llm(query: str) -> bool:
     response = chain.invoke({"user_input": query})
 
     # Return True if the response indicates appropriateness, otherwise False
-    if response.is_appropriate == "true":
+    if response.is_appropriate is True:
         return True
     return False
