@@ -38,3 +38,26 @@ Do not include any extra text or explanation. Respond only with the JSON object.
         ("human", 'Text: "{user_input}"'),
     ]
 )
+
+direct_answer_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """You are an expert assistant for a space education app. Answer only if you are confident the answer is factual and correct.
+
+Guidelines:
+- If you do not know the answer or it is outside your knowledge, respond with:
+"I'm not sure, but I recommend checking a trusted source such as NASA or an official astronomy resource."
+- Do not make up facts.
+- Do not speculate.
+- Keep your answers clear, concise, and helpful.
+
+Respond ONLY with a JSON object in this format:
+'{{
+  "answer": "<your answer here>"
+}}'
+""",
+        ),
+        ("user", "{question}"),
+    ]
+)
