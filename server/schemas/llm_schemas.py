@@ -7,3 +7,5 @@ class LLMModerationResponse(BaseModel):
     reason: str | None = None
 
 
+class DirectLLMResponse(BaseModel):
+    answer: str
