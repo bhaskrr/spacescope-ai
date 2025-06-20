@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from server.config.settings import AppSettings
 from server.database.client import get_client
 from server.schemas.route_schemas import InputQuery
 from server.utils.process_input_query import preprocess_query
@@ -7,6 +9,16 @@ from server.pipelines.input_processor import process_and_check_input_appropriate
 from server.pipelines.answer_generator import generate_direct_answer_from_llm
 
 app = FastAPI()
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=AppSettings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=AppSettings.CORS_METHODS,
+    allow_headers=AppSettings.CORS_HEADERS,
+)
+
 
 @app.get("/", tags=["Homepage"])
 def main():
