@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List, Optional
 
 
 class LLMModerationResponse(BaseModel):
@@ -8,4 +7,8 @@ class LLMModerationResponse(BaseModel):
 
 
 class DirectLLMResponse(BaseModel):
+    answer: str
+
+
+class RAGLLMResponse(BaseModel):
     answer: str
