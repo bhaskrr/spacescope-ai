@@ -61,3 +61,34 @@ Respond ONLY with a JSON object in this format:
         ("user", "{question}"),
     ]
 )
+
+rag_prompt_template = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """You are a helpful and factually accurate AI assistant specialized in astronomy, space science, and celestial events.
+Answer the user's question **only** using the provided context. Do **not** make up any information not present in the context.
+
+If the context does not contain enough information to answer the question, respond with:
+"I'm not sure based on the provided information. I recommend checking an official source like NASA for more details."
+
+Be concise (4–6 sentences), factual, and avoid speculation or opinions.
+
+Respond ONLY with a JSON object in this format:
+'{{
+  "answer": "<your answer here>"
+}}'
+""",
+        ),
+        (
+            "user",
+            """<context>
+{context}
+</context>
+
+Question:
+{question}
+""",
+        ),
+    ]
+)
