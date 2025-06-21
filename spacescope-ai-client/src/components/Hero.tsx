@@ -8,10 +8,16 @@ type HeroProps = {
   isDarkMode: boolean;
 };
 
+type Source = {
+  title: string;
+  url: string;
+};
+
 export function Hero({ isDarkMode }: HeroProps) {
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState("normal");
   const [answer, setAnswer] = useState("");
+  const [sources, setSources] = useState([]);
   const [error, setError] = useState("");
   const [isDisabled, setIsDisabled] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,23 +39,29 @@ export function Hero({ isDarkMode }: HeroProps) {
   async function handleSubmit() {
     setIsSubmitting(true);
     setIsDisabled(true);
+    setSources([]);
+    setAnswer("");
     setError("");
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_DIRECT_ANSWER_URL}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query: query }),
-        }
-      );
+      const response = await fetch(`${process.env.NEXT_PUBLIC_ANSWER_URL}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: query, mode: mode }),
+      });
 
       if (!response.ok) {
         setError("Answer generation failed. Please try again.");
       }
 
       const result = await response.json();
-      setAnswer(result["answer"]);
+
+      if (result["answer"]) {
+        setAnswer(result["answer"]);
+      }
+
+      if (result["metadata"]) {
+        setSources(result["metadata"]);
+      }
     } finally {
       setIsSubmitting(false);
       setIsDisabled(false);
@@ -159,6 +171,37 @@ export function Hero({ isDarkMode }: HeroProps) {
             <h4 className="text-lg font-bold mb-4">AI answer</h4>
             <p>{answer}</p>
           </div>
+          {sources && sources.length > 0 && (
+            <div className="mb-4">
+              <h5 className="font-bold mb-2 text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                <Database className="inline w-5 h-5" />
+                Sources
+              </h5>
+              <ul className="space-y-3">
+                {sources.map((source: Source, index) => (
+                  <li
+                    key={index}
+                    className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 shadow-sm flex flex-col gap-1 border border-slate-200 dark:border-slate-700"
+                  >
+                    <span className="font-semibold text-base">
+                      {source.url ? (
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800"
+                        >
+                          {source.title || `Source ${index + 1}`}
+                        </a>
+                      ) : (
+                        source.title || `Source ${index + 1}`
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <Button className="cursor-pointer bg-gray-600" onClick={copyAnswer}>
             <Copy />
