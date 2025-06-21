@@ -21,7 +21,7 @@ def retrieve_relevant_documents(query: str) -> dict:
     collection = client.get_collection(name="space_docs", embedding_function=default_ef)
 
     # Query the collection
-    relevant_docs = collection.query(query_texts=query, n_results=3)
+    relevant_docs = collection.query(query_texts=query, n_results=7)
 
     # Return the retrieved documents
     return relevant_docs
