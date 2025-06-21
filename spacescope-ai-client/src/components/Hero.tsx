@@ -22,7 +22,7 @@ export function Hero({ isDarkMode }: HeroProps) {
   const [isDisabled, setIsDisabled] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleInputQueryChange(e) {
+  function handleInputQueryChange(e: React.ChangeEvent<HTMLInputElement>) {
     const input: string = e.target.value;
     setQuery(input);
     if (!input.trim()) {
