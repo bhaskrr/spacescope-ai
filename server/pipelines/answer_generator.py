@@ -1,9 +1,10 @@
 from server.llm_clients.groq_client import get_llm_client
-from server.prompt_templates.templates import direct_answer_prompt
-from server.schemas.llm_schemas import DirectLLMResponse
+from server.prompt_templates.templates import direct_answer_prompt, rag_prompt_template
+from server.schemas.llm_schemas import DirectLLMResponse, RAGLLMResponse
+from server.database.retriever import retrieve_relevant_documents
 
 
-def generate_direct_answer_from_llm(query: str) -> str:
+def generate_direct_answer_from_llm(query: str):
     """
     Generate a direct answer to a user query using an LLM.
 
@@ -31,4 +32,41 @@ def generate_direct_answer_from_llm(query: str) -> str:
     response = chain.invoke({"question": query})
 
     # Return the answer field from the structured response
-    return response.answer
+    return {"answer": response.answer}
+
+
+def answer_with_rag(query: str):
+    """"""
+    # Initialize the LLM client with the desired model
+    client = get_llm_client(model_name="llama-3.3-70b-versatile")
+
+    # Configure the LLM to expect a structured output
+    llm = client.with_structured_output(RAGLLMResponse, method="json_mode")
+
+    # Retrieve relevant documents from the vector database
+    relevant_docs = retrieve_relevant_documents(query)
+    
+    # ! Debugging
+    print("Docs:", relevant_docs)
+
+    # Create a prompt chain
+    chain = rag_prompt_template | llm
+
+    # Invoke the chain with the user's question and retrieved context to get the structured response
+    response = chain.invoke(
+        {"question": query, "context": relevant_docs["documents"][0]}
+    )
+
+    # Extract unique title, url pairs from the metadata
+    seen = set()
+    unique_sources = []
+
+    for meta in relevant_docs["metadatas"][0]:
+        key = (meta.get("title"), meta.get("url"))
+        if key not in seen:
+            seen.add(key)
+            unique_sources.append({"title": key[0], "url": key[1]})
+
+    # Return the metadata and answer
+    return {"metadata": unique_sources, "answer": response.answer}
+
