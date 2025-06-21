@@ -65,6 +65,7 @@ This project was built within one week for the **Stellar Gateway Hackathon 🚀*
 - Spent ~40 hours across backend, frontend, deployment, and debugging
 - Learned to deploy ChromaDB with GCS persistence
 - Used Groq for fast, reliable LLM inference
+- Utilized Langsmith for monitoring
 - Vercel + Tailwind for frontend speed and aesthetics
 
 ## 🧠 Tech Stack
